@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    SPDX-FileCopyrightText: 2025 Health-RI
+
+    SPDX-License-Identifier: Apache-2.0
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.0.0</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>nl.healthri</groupId>
+    <artifactId>project-pubmet</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>pubmet-core</module>
+        <module>pubmet-cloud</module>
+        <module>pubmet-local</module>
+    </modules>
+
+    <properties>
+        <!-- project settings -->
+        <java.version>25</java.version>
+
+        <!-- library version management -->
+        <rdf4j.version>5.2.2</rdf4j.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <!-- consider moving to property -->
+                <version>5.0.0</version>
+                <configuration>
+                    <licenseSets>
+                        <licenseSet>
+                            <header>license-header.spdx</header>
+                            <includes>
+                                <include>**/pom.xml</include>
+                                <include>**/*.java</include>
+                            </includes>
+                        </licenseSet>
+                    </licenseSets>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
