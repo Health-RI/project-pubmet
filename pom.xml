@@ -33,9 +33,67 @@
 
         <!-- library version management -->
         <rdf4j.version>5.2.2</rdf4j.version>
+
+        <!-- test version management -->
+        <groovy.version>5.0.2</groovy.version>
+        <spock.version>2.4-groovy-5.0</spock.version>
+        <junit.version>6.0.1</junit.version>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy</artifactId>
+                <version>${groovy.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.spockframework</groupId>
+                <artifactId>spock-core</artifactId>
+                <version>${spock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <build>
+        <testSourceDirectory>src/test/groovy</testSourceDirectory>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.gmavenplus</groupId>
+                    <artifactId>gmavenplus-plugin</artifactId>
+                    <version>4.2.1</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>compileTests</goal>
+                            </goals>
+                            <configuration>
+                                <!-- default value doesn't seem to work with a combination of groovy and gmavenplus -->
+                                <targetBytecode>${maven.compiler.release}</targetBytecode>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <includes>
+                            <include>**/*Spec.*</include>
+                        </includes>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>com.mycila</groupId>
@@ -49,6 +107,7 @@
                             <includes>
                                 <include>**/pom.xml</include>
                                 <include>**/*.java</include>
+                                <include>**/*.groovy</include>
                             </includes>
                         </licenseSet>
                     </licenseSets>
