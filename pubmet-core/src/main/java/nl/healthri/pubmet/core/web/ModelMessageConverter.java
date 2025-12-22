@@ -9,6 +9,7 @@ import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFHandlerException;
 import org.eclipse.rdf4j.rio.Rio;
+import org.eclipse.rdf4j.rio.UnsupportedRDFormatException;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -41,7 +42,7 @@ public class ModelMessageConverter extends AbstractHttpMessageConverter<Model> {
         // TODO confirm we need to close the outputstream
         try (var stream = outputMessage.getBody()) {
             Rio.write(statements, stream, format);
-        } catch (RDFHandlerException e) {
+        } catch (RDFHandlerException | UnsupportedRDFormatException e) {
             // TODO improve error message and logging
             throw new HttpMessageNotWritableException("Could not write RDF model", e);
         }
