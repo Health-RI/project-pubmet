@@ -10,22 +10,22 @@ import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.util.Values;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.RDFHandlerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpOutputMessage;
+import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.mock.http.MockHttpOutputMessage;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 class ModelMessageConverterTest {
-
-    private ModelMessageConverter converter;
-
-    @BeforeEach
-    void setUp() {
-        converter = new ModelMessageConverter(RDFFormat.TURTLE);
-    }
 
     private Model createSampleModel() {
         var model = new LinkedHashModel();
@@ -38,6 +38,7 @@ class ModelMessageConverterTest {
     @Test
     void GivenValidModel_WhenWriteInternal_ReturnModelContentAsBody() throws IOException {
         // Arrange
+        var converter = new ModelMessageConverter(RDFFormat.TURTLE);
         var expected = "\r\n<http://example.com> <http://www.w3.org/2000/01/rdf-schema#label> \"hello world\" .\r\n";
         var model = createSampleModel();
         var message = new MockHttpOutputMessage();
@@ -49,4 +50,20 @@ class ModelMessageConverterTest {
         var actual = message.getBodyAsString();
         assertEquals(expected, actual);
     }
+
+
+    @Test
+    void GivenConverterWithUnsupportedFormat_WhenWriteInternal_ReturnHttpNotWritableException() throws IOException {
+        // Arrange
+        var invalidFormatConverter = new ModelMessageConverter(RDFFormat.HDT);
+        var expected = HttpMessageNotWritableException.class;
+        var model = new LinkedHashModel();
+        var message = new MockHttpOutputMessage();
+
+        // Act & Assert
+        assertThrows(expected, () ->
+                invalidFormatConverter.writeInternal(model, message)
+        );
+    }
+
 }
