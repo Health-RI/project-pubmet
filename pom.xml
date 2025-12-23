@@ -64,36 +64,6 @@
     </dependencyManagement>
 
     <build>
-        <testSourceDirectory>src/test/groovy</testSourceDirectory>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.codehaus.gmavenplus</groupId>
-                    <artifactId>gmavenplus-plugin</artifactId>
-                    <version>4.2.1</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>compileTests</goal>
-                            </goals>
-                            <configuration>
-                                <!-- default value doesn't seem to work with a combination of groovy and gmavenplus -->
-                                <targetBytecode>${maven.compiler.release}</targetBytecode>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <configuration>
-                        <includes>
-                            <include>**/*Spec.*</include>
-                        </includes>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>com.mycila</groupId>
