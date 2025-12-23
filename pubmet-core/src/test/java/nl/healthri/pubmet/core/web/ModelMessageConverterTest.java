@@ -10,19 +10,13 @@ import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.util.Values;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.rio.RDFFormat;
-import org.eclipse.rdf4j.rio.RDFHandlerException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.mock.http.MockHttpOutputMessage;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 
 class ModelMessageConverterTest {
@@ -53,7 +47,7 @@ class ModelMessageConverterTest {
 
 
     @Test
-    void GivenConverterWithUnsupportedFormat_WhenWriteInternal_ReturnHttpNotWritableException() throws IOException {
+    void GivenConverterWithUnsupportedFormat_WhenWriteInternal_ReturnHttpNotWritableException() {
         // Arrange
         var invalidFormatConverter = new ModelMessageConverter(RDFFormat.HDT);
         var expected = HttpMessageNotWritableException.class;
