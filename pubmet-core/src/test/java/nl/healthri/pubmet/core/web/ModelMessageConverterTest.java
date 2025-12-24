@@ -14,7 +14,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.mock.http.MockHttpOutputMessage;
 import java.io.IOException;
+import java.util.Map;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -27,6 +29,20 @@ class ModelMessageConverterTest {
         model.add(subject, RDFS.LABEL, Values.literal("hello world"));
 
         return model;
+    }
+
+    @Test
+    void GivenModelClass_WhenSupports_ReturnTrue(){
+        // Arrange & Act
+        var converter = new ModelMessageConverter(RDFFormat.TURTLE);
+
+        // Assert (true)
+        assertThat(converter.supports(Model.class)).isTrue();
+
+        // Assert (false)
+        assertThat(converter.supports(Map.class)).isFalse();
+        assertThat(converter.supports(String.class)).isFalse();
+        assertThat(converter.supports(Object.class)).isFalse();
     }
 
     @Test
@@ -59,5 +75,4 @@ class ModelMessageConverterTest {
                 invalidFormatConverter.writeInternal(model, message)
         );
     }
-
 }
