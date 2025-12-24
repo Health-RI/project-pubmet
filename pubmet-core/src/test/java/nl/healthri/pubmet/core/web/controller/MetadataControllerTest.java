@@ -7,6 +7,7 @@ package nl.healthri.pubmet.core.web.controller;
 
 import nl.healthri.pubmet.core.TestConstants;
 import nl.healthri.pubmet.core.api.MetadataProvider;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +30,20 @@ public class MetadataControllerTest {
 
     @Test
     public void testMetadataRetrieval(@Autowired MockMvc mvc) throws Exception {
-        BDDMockito.given(provider.getMetadata("hello")).willReturn(Optional.of(TestConstants.TEST_MODEL));
+        // Arrange
+        var expected = TestConstants.TEST_TURTLE;
 
+        // Act
+        BDDMockito.given(provider.getMetadata("hello")).
+                willReturn(Optional.ofNullable(TestConstants.TEST_MODEL));
+
+        // Assert
         mvc.perform(get("/hello"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("text/turtle"))
-                .andExpect(content().string(TestConstants.TEST_TURTLE));
+                .andExpect(result -> {
+                    var actual = result.getResponse().getContentAsString().trim();
+                    Assertions.assertEquals(actual, expected);
+                });
     }
 }
