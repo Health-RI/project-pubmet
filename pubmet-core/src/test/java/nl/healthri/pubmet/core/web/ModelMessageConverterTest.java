@@ -17,8 +17,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class ModelMessageConverterTest {
@@ -74,5 +73,24 @@ class ModelMessageConverterTest {
         assertThrows(expected, () ->
                 invalidFormatConverter.writeInternal(model, message)
         );
+    }
+
+    @Test
+    void GivenNewTurtleMimeTypes_WhenConstructorCalled_AddAndReturnTurtleMimeTypes() {
+        // Arrange
+        var format = RDFFormat.TURTLE;
+        var expectedMimeTypes = format.getMIMETypes();
+
+        // Act
+        var converter = new ModelMessageConverter(format);
+
+        // Assert
+        var actualMimeTypes = converter.getSupportedMediaTypes();
+
+        assertEquals(expectedMimeTypes.size(), actualMimeTypes.size(), "Should have the same number of media types as the RDF format");
+
+        for (String mimeType : expectedMimeTypes) {
+            assertTrue(actualMimeTypes.stream().anyMatch(mediaType -> mediaType.toString().equals(mimeType)) );
+        }
     }
 }
