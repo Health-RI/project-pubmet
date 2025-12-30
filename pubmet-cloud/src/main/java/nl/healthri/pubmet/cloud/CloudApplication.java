@@ -11,7 +11,6 @@ import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.util.Values;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
-import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +28,7 @@ import java.util.Optional;
 public class CloudApplication {
     private static final Logger logger = LoggerFactory.getLogger(CloudApplication.class);
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.run(CloudApplication.class, args);
     }
 
@@ -43,7 +42,7 @@ public class CloudApplication {
                 logger.info("Retrieving metadata with id: {}", id);
 
                 var model = new LinkedHashModel();
-                var subject = Values.iri("http://example.com/" + id);
+                var subject = Values.iri("https://example.com/" + id);
                 model.add(subject, RDFS.LABEL, Values.literal("hello world"));
 
                 return Optional.of(model);
@@ -58,7 +57,7 @@ public class CloudApplication {
                 var model =  Rio.parse(reader, "", format);
 
                 InMemoryModels.add(model);
-                logger.info("Successfully uploaded metadata: " + InMemoryModels);
+                logger.info("Successfully uploaded metadata: {}", InMemoryModels);
 
                 return model;
             }
