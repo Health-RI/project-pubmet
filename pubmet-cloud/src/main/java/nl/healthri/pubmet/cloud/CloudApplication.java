@@ -21,6 +21,8 @@ import org.springframework.context.annotation.Bean;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @SpringBootApplication
@@ -30,6 +32,8 @@ public class CloudApplication {
     public static void main(String[] args) {
         SpringApplication.run(CloudApplication.class, args);
     }
+
+    private final List<Model> InMemoryModels = new ArrayList<>();
 
     @Bean
     public MetadataProvider customProvider() {
@@ -51,8 +55,12 @@ public class CloudApplication {
 
                 var reader =  new StringReader(body);
                 var format = Rio.getParserFormatForMIMEType(contentType).orElseThrow(BadRequestException::new);
+                var model =  Rio.parse(reader, "", format);
 
-                return Rio.parse(reader, "", format);
+                InMemoryModels.add(model);
+                logger.info("Successfully uploaded metadata: " + InMemoryModels);
+
+                return model;
             }
         };
     }

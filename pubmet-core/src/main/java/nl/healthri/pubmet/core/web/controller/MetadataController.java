@@ -25,6 +25,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping
@@ -53,6 +56,7 @@ public class MetadataController {
 
         try {
             var model = provider.uploadMetadata(body, contentType);
+
             return ResponseEntity.status(HttpStatus.CREATED).body((model));
         } catch (Exception e) {
             logger.error("Failed to upload metadata", e);
