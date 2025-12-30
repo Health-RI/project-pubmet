@@ -17,6 +17,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -34,11 +35,12 @@ public class MetadataControllerTest {
         var expected = TestConstants.TEST_TURTLE;
 
         // Act
-        BDDMockito.given(provider.getMetadata("hello")).
+        UUID id = UUID.randomUUID();
+        BDDMockito.given(provider.getMetadata(id)).
                 willReturn(Optional.ofNullable(TestConstants.TEST_MODEL));
 
         // Assert
-        mvc.perform(get("/hello"))
+        mvc.perform(get("/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("text/turtle"))
                 .andExpect(result -> {

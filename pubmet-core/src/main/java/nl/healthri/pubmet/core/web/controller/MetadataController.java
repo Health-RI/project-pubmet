@@ -13,6 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
+
 @RestController
 @RequestMapping
 public class MetadataController {
@@ -25,7 +28,7 @@ public class MetadataController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Model> getMetadata(@PathVariable String id) {
+    public ResponseEntity<Model> getMetadata(@PathVariable UUID id) {
         logger.info("Got a request for metadata with id {}", id);
 
         var model = provider.getMetadata(id);

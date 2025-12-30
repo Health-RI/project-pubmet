@@ -9,9 +9,9 @@ import org.eclipse.rdf4j.model.Model;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface MetadataProvider {
-    Optional<Model> getMetadata(String id);
+    Optional<Model> getMetadata(UUID id);
     Model uploadMetadata(String body, String contentType) throws IOException;
-
 }
