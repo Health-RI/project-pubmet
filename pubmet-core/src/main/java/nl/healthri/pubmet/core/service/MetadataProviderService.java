@@ -30,20 +30,18 @@ public class MetadataProviderService implements MetadataProvider {
     }
 
     @Override
-    public Model uploadMetadata(@NonNull String body, @NonNull String contentType) throws IOException {
+    public void uploadMetadata(@NonNull String body, @NonNull String contentType) throws IOException {
         logger.info("Uploading metadata");
 
         var reader = new StringReader(body);
         var format = Rio.getParserFormatForMIMEType(contentType)
                 .orElseThrow(() -> new BadRequestException("Unsupported content type: " + contentType));
 
-        // todo: set ID here somewhere?
         var model = Rio.parse(reader, "", format);
         UUID uuid = UUID.randomUUID();
 
         inMemoryModels.put(uuid, model);
 
         logger.info("Successfully uploaded metadata. Total models: {}", inMemoryModels.size());
-        return model;
     }
 }

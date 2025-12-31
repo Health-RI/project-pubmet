@@ -36,15 +36,15 @@ public class MetadataController {
     }
 
     @PostMapping()
-    public ResponseEntity<Model> uploadMetadata(
+    public ResponseEntity<Void> uploadMetadata(
             @RequestBody String body,
             @RequestHeader("Content-Type") String contentType){
         logger.info("Received request to upload metadata containing");
 
         try {
-            var model = provider.uploadMetadata(body, contentType);
+            provider.uploadMetadata(body, contentType);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body((model));
+            return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (Exception e) {
             logger.error("Failed to upload metadata", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

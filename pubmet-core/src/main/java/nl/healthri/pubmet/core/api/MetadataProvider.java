@@ -13,5 +13,5 @@ import java.util.UUID;
 
 public interface MetadataProvider {
     Optional<Model> getMetadata(UUID id);
-    Model uploadMetadata(String body, String contentType) throws IOException;
+    void uploadMetadata(String body, String contentType) throws IOException;
 }
