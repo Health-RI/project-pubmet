@@ -15,13 +15,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.MimeTypeUtils;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -47,5 +48,23 @@ public class MetadataControllerTest {
                     var actual = result.getResponse().getContentAsString().trim();
                     Assertions.assertEquals(actual, expected);
                 });
+    }
+
+    @Test
+    public void GivenNewMetadata_WhenUploadMetadata_ReturnStatusCreated(@Autowired MockMvc mvc) throws Exception {
+        // Arrange
+        var contentType = MimeTypeUtils.APPLICATION_JSON.toString();
+        var modelContent = TestConstants.TEST_TURTLE;
+
+        var expectedStatus = status().isCreated();
+
+        // Act & Assert
+        var request = post("/")
+                .content(modelContent)
+                .contentType(contentType);
+
+        mvc.perform(request)
+                .andExpect(expectedStatus)
+                .andExpect(status().isCreated());
     }
 }
