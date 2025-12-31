@@ -14,7 +14,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
 public class TestApplication implements WebMvcConfigurer {
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.run(TestApplication.class, args);
     }
 

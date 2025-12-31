@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package nl.healthri.pubmet.core.service;
+package nl.healthri.pubmet.core.services;
 
 import nl.healthri.pubmet.core.api.MetadataProvider;
 import org.apache.coyote.BadRequestException;
@@ -19,10 +19,10 @@ import java.io.StringReader;
 import java.util.*;
 
 @Service
-public class MetadataProviderService implements MetadataProvider {
-    private static final Logger logger = LoggerFactory.getLogger(nl.healthri.pubmet.core.service.MetadataProviderService.class);
+public class MetadataProviderServices implements MetadataProvider {
+    private static final Logger logger = LoggerFactory.getLogger(MetadataProviderServices.class);
 
-    private final Map<UUID, Model> inMemoryModels = new HashMap<>();
+    public final Map<UUID, Model> inMemoryModels = new HashMap<>();
 
     @Override
     public Optional<Model> getMetadata(@NonNull UUID id) {
@@ -36,12 +36,10 @@ public class MetadataProviderService implements MetadataProvider {
         var reader = new StringReader(body);
         var format = Rio.getParserFormatForMIMEType(contentType)
                 .orElseThrow(() -> new BadRequestException("Unsupported content type: " + contentType));
-
         var model = Rio.parse(reader, "", format);
-        UUID uuid = UUID.randomUUID();
+        var uuid = UUID.randomUUID();
 
         inMemoryModels.put(uuid, model);
-
         logger.info("Successfully uploaded metadata. Total models: {}", inMemoryModels.size());
     }
 }

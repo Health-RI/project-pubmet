@@ -86,9 +86,7 @@ class ModelMessageConverterTest {
 
         // Assert
         var actualMimeTypes = converter.getSupportedMediaTypes();
-
         assertEquals(expectedMimeTypes.size(), actualMimeTypes.size(), "Should have the same number of media types as the RDF format");
-
         for (String mimeType : expectedMimeTypes) {
             assertTrue(actualMimeTypes.stream().anyMatch(mediaType -> mediaType.toString().equals(mimeType)) );
         }
