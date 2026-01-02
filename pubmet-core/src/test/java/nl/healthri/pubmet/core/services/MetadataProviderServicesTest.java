@@ -20,7 +20,7 @@ class MetadataProviderServicesTest {
     }
 
     @Test
-    void GivenValidTurtleRdf_WhenUploadMetadata_ThenSaveModel(){
+    void GivenValidModel_WhenUploadMetadata_ThenSaveModel(){
         // Arrange
         var modelContent = TestConstants.TEST_TURTLE;
         var contentType = "text/turtle";
@@ -32,13 +32,13 @@ class MetadataProviderServicesTest {
     }
 
     @Test
-    void GivenInvalidTurtleRdf_WhenUploadMetadata_ThenThrowBadRequestException(){
+    void GivenInvalidModel_WhenUploadMetadata_ThenThrowIOException(){
         // Arrange
         var data = "some random data";
         var invalidType = "application/not-real";
 
         // Act & Assert
-        assertThrows(BadRequestException.class, () ->
+        assertThrows(IOException.class, () ->
                 service.uploadMetadata(data, invalidType)
         );
     }
