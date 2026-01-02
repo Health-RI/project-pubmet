@@ -6,7 +6,6 @@
 package nl.healthri.pubmet.core.services;
 
 import nl.healthri.pubmet.core.api.MetadataProvider;
-import org.apache.coyote.BadRequestException;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.rio.Rio;
 import org.jspecify.annotations.NonNull;
@@ -35,7 +34,7 @@ public class MetadataProviderServices implements MetadataProvider {
 
         var reader = new StringReader(body);
         var format = Rio.getParserFormatForMIMEType(contentType)
-                .orElseThrow(() -> new BadRequestException("Unsupported content type: " + contentType));
+                .orElseThrow(() -> new IOException("Unsupported content type: " + contentType));
         var model = Rio.parse(reader, "", format);
         var uuid = UUID.randomUUID();
 
