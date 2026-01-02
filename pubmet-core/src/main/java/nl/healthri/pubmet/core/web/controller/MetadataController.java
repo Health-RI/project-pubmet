@@ -17,7 +17,7 @@ import java.util.UUID;
 
 
 @RestController
-@RequestMapping
+@RequestMapping(path = "metadata")
 public class MetadataController {
     private static final Logger logger = LoggerFactory.getLogger(nl.healthri.pubmet.core.web.controller.MetadataController.class);
 
