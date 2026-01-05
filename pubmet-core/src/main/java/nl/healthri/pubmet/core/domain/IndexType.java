@@ -5,7 +5,7 @@
  */
 package nl.healthri.pubmet.core.domain;
 
-enum IndexType {
+public enum IndexType {
     PUSH,
     PULL,
 }
