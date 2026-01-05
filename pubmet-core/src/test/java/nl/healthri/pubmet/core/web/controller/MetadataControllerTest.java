@@ -41,7 +41,7 @@ public class MetadataControllerTest {
                 willReturn(Optional.ofNullable(TestConstants.TEST_MODEL));
 
         // Assert
-        mvc.perform(get("/{id}", id))
+        mvc.perform(get("/metadata/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("text/turtle"))
                 .andExpect(result -> {
@@ -59,7 +59,7 @@ public class MetadataControllerTest {
         var expectedStatus = status().isCreated();
 
         // Act & Assert
-        var request = post("/")
+        var request = post("/metadata")
                 .content(modelContent)
                 .contentType(contentType);
 

@@ -1,7 +1,11 @@
+/*
+ * SPDX-FileCopyrightText: 2025 Health-RI
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package nl.healthri.pubmet.core.services;
 
 import nl.healthri.pubmet.core.TestConstants;
-import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
