@@ -19,6 +19,8 @@ public class IndexService {
 
     public Index create(Index index) {
         inMemoryIndexes.put(index.id, index);
+        logger.info("Successfully uploaded indexes. Total models: {}", inMemoryIndexes.size());
+
         return index;
     }
 
@@ -27,6 +29,7 @@ public class IndexService {
         if (found == null) {
             throw new NoSuchElementException("Index not found with ID: " + id);
         }
+
         return found;
     }
 }
