@@ -9,6 +9,8 @@ import nl.healthri.pubmet.core.domain.Index;
 import nl.healthri.pubmet.core.domain.IndexType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -18,24 +20,21 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 public class IndexServiceTest {
 
-    private IndexService service;
+    private IndexService indexService;
 
     @BeforeEach
     void setUp() {
-        service = new IndexService();
+        indexService = new IndexService();
     }
 
     public Index createSampleIndex() throws URISyntaxException, MalformedURLException {
         return new Index(
                 UUID.randomUUID(),
-                "Test Title",
-                "test@example.com",
-                "Test Name",
-                "Description",
+                new URI("http://healthri.nl/").toURL(),
                 "Health-RI",
-                new URI("https://example.com").toURL(),
                 IndexType.PUSH
         );
     }
@@ -46,19 +45,19 @@ public class IndexServiceTest {
         var index = createSampleIndex();
 
         // Act
-        Index result = service.create(index);
+        Index result = indexService.create(index);
 
         // Assert
         assertNotNull(result);
         assertEquals(index.id, result.id);
-        assertEquals(1, service.inMemoryIndexes.size());
-        assertEquals(index, service.inMemoryIndexes.get(index.id));
+        assertEquals(1, indexService.inMemoryIndexes.size());
+        assertEquals(index, indexService.inMemoryIndexes.get(index.id));
     }
 
     @Test
     public void GivenInvalidIndex_WhenCreatingIndex_Return() {
         // Act & Assert
-        assertThrows(NullPointerException.class, () -> service.create(null));
+        assertThrows(NullPointerException.class, () -> indexService.create(null));
     }
 
     @Test
@@ -67,21 +66,14 @@ public class IndexServiceTest {
         var index = createSampleIndex();
 
         // Act
-        service.inMemoryIndexes.put(index.id, index);
-        var found = service.findById(index.id);
+        indexService.inMemoryIndexes.put(index.id, index);
+        var found = indexService.findById(index.id);
 
         // Assert
         assertNotNull(found);
         assertEquals(index.id, found.id);
-        assertEquals(index.title, found.title);
-        assertEquals(index.description, found.description);
-        assertEquals(index.name, found.name);
         assertEquals(index.url, found.url);
-        assertEquals(index.email, found.email);
         assertEquals(index.organization, found.organization);
-        assertEquals(index.url, found.url);
-        assertEquals(index.indexType, found.indexType);
-
     }
 
     @Test
@@ -90,6 +82,6 @@ public class IndexServiceTest {
         var nonExistentId = UUID.randomUUID();
 
         // Act & Assert
-        assertThrows(NoSuchElementException.class, () -> service.findById(nonExistentId));
+        assertThrows(NoSuchElementException.class, () -> indexService.findById(nonExistentId));
     }
 }

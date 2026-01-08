@@ -13,6 +13,7 @@ import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.MimeTypeUtils;
@@ -55,16 +56,15 @@ public class MetadataControllerTest {
         // Arrange
         var contentType = MimeTypeUtils.APPLICATION_JSON.toString();
         var modelContent = TestConstants.TEST_TURTLE;
-
-        var expectedStatus = status().isCreated();
+        var origin = "https://www.health-ri.nl/";
 
         // Act & Assert
         var request = post("/metadata")
                 .content(modelContent)
-                .contentType(contentType);
+                .contentType(contentType)
+                .header(HttpHeaders.ORIGIN, origin);
 
         mvc.perform(request)
-                .andExpect(expectedStatus)
                 .andExpect(status().isCreated());
     }
 }

@@ -43,12 +43,8 @@ public class IndexControllerTest {
     public Index createSampleIndex() throws URISyntaxException, MalformedURLException {
         return new Index(
                 UUID.randomUUID(),
-                "Test Title",
-                "test@example.com",
-                "Test Name",
-                "Description",
+                new URI("http://healthri.nl/").toURL(),
                 "Health-RI",
-                new URI("https://example.com").toURL(),
                 IndexType.PUSH
         );
     }
@@ -86,7 +82,6 @@ public class IndexControllerTest {
 
     @Test
     public void GivenExistingIndex_WhenFindingIndexById_ReturnOkWithIndex(){
-
 
     }
 
