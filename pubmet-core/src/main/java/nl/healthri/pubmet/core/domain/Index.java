@@ -10,22 +10,14 @@ import java.util.UUID;
 
 public class Index {
     public UUID id;
-    public String title;
-    public String email;
-    public String name;
-    public String description;
-    public String organization;
     public URL url;
-    public IndexType indexType;
+    public String organization;
+    public IndexType type;
 
-    public Index(UUID id, String title, String email, String name, String description, String organization, URL url, IndexType indexType) {
+    public Index(UUID id, URL url, String organization, IndexType type) {
         this.id = id;
-        this.title = title;
-        this.email = email;
-        this.name = name;
-        this.description = description;
-        this.organization = organization;
         this.url = url;
-        this.indexType = indexType;
+        this.organization = organization;
+        this.type = type;
     }
 }
