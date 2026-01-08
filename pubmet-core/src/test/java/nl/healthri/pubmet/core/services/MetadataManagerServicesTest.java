@@ -6,24 +6,30 @@
 package nl.healthri.pubmet.core.services;
 
 import nl.healthri.pubmet.core.TestConstants;
+import nl.healthri.pubmet.core.domain.Index;
+import nl.healthri.pubmet.core.domain.IndexType;
 import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Optional;
 import java.util.HashMap;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 class MetadataManagerServicesTest {
-
-    private MetadataManagerServices service;
+    @MockitoBean
+    private IndexService indexService;
+    private MetadataManagerServices metadataManagerService;
 
     @BeforeEach
     void setUp() {
-        var inMemoryModels = new HashMap<UUID, Model>();
-        service = new MetadataManagerServices(inMemoryModels);
+        metadataManagerService = new MetadataManagerServices(indexService);
     }
 
     @Test
@@ -31,10 +37,11 @@ class MetadataManagerServicesTest {
         // Arrange
         var modelContent = TestConstants.TEST_TURTLE;
         var contentType = "text/turtle";
+        var origin = "https://www.health-ri.nl/";
 
         // Act & Assert
         assertDoesNotThrow(() ->
-                service.uploadMetadata(modelContent, contentType)
+                metadataManagerService.uploadMetadata(modelContent, contentType, origin)
         );
     }
 
@@ -43,10 +50,11 @@ class MetadataManagerServicesTest {
         // Arrange
         var data = "some random data";
         var invalidType = "application/not-real";
+        var origin = "https://www.health-ri.nl/";
 
         // Act & Assert
         assertThrows(IOException.class, () ->
-                service.uploadMetadata(data, invalidType)
+                metadataManagerService.uploadMetadata(data, invalidType, origin)
         );
     }
 
@@ -56,23 +64,31 @@ class MetadataManagerServicesTest {
         var id = UUID.randomUUID();
 
         // Act
-        var result = service.getMetadata(id);
+        var result = metadataManagerService.getMetadata(id);
 
         // Assert
         assertTrue(result.isEmpty());
     }
 
     @Test
-    void GivenExistingModel_WhenGettingMetadata_ReturnModel() throws IOException {
+    void GivenExistingModel_WhenGettingMetadata_ReturnModel() throws IOException, URISyntaxException {
         // Arrange
+        var url = URI.create("https://www.health-ri.nl/").toURL();
+        var index = new Index(UUID.randomUUID(), url, "Health-RI", IndexType.PUSH);
+
         var contentType = "text/turtle";
         var expectedMapSize = 1;
+        var origin = "https://www.health-ri.nl/";
 
         // Act
-        service.uploadMetadata(TestConstants.TEST_TURTLE, contentType);
+        Mockito.when(metadataManagerService.indexService
+                .findByOrigin(anyString()))
+                .thenReturn(Optional.of(index));
+
+        metadataManagerService.uploadMetadata(TestConstants.TEST_TURTLE, contentType, origin);
 
         // Assert
-        assertEquals(expectedMapSize, service.inMemoryModels.size());
+        assertEquals(expectedMapSize, metadataManagerService.inMemoryModels.size());
     }
 
 }

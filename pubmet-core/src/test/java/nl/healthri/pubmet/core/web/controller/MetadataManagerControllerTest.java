@@ -15,6 +15,7 @@ import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.MimeTypeUtils;
@@ -42,8 +43,8 @@ public class MetadataManagerControllerTest {
         BDDMockito.given(provider.getMetadata(id))
                 .willReturn(Optional.of(expectedModel));
 
-        // Act & Assert
-        mvc.perform(get("/{id}", id))
+        // Assert
+        mvc.perform(get("/metadata/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("text/turtle"))
                 .andExpect(result -> {
@@ -64,11 +65,13 @@ public class MetadataManagerControllerTest {
         // Arrange
         var contentType = MimeTypeUtils.APPLICATION_JSON.toString();
         var modelContent = TestConstants.TEST_TURTLE;
+        var origin = "https://www.health-ri.nl/";
 
         // Act & Assert
-        var request = post("/")
+        var request = post("/metadata")
                 .content(modelContent)
-                .contentType(contentType);
+                .contentType(contentType)
+                .header(HttpHeaders.ORIGIN, origin);
 
         mvc.perform(request)
                 .andExpect(status().isCreated());
