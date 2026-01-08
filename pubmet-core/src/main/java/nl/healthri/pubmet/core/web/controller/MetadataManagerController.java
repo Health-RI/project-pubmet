@@ -9,6 +9,7 @@ import nl.healthri.pubmet.core.api.MetadataManager;
 import org.eclipse.rdf4j.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,11 +40,13 @@ public class MetadataManagerController {
     @PostMapping
     public ResponseEntity<String> uploadMetadata(
             @RequestBody String body,
-            @RequestHeader("Content-Type") String contentType){
+            @RequestHeader(HttpHeaders.CONTENT_TYPE) String contentType,
+            @RequestHeader(HttpHeaders.ORIGIN) String origin)
+    {
         logger.info("Received request to upload metadata containing");
 
         try {
-            provider.uploadMetadata(body, contentType);
+            provider.uploadMetadata(body, contentType, origin);
 
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (IOException e) {

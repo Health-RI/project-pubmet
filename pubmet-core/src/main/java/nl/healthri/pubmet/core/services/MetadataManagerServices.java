@@ -6,6 +6,9 @@
 package nl.healthri.pubmet.core.services;
 
 import nl.healthri.pubmet.core.api.MetadataManager;
+import nl.healthri.pubmet.core.api.MetadataProvider;
+import nl.healthri.pubmet.core.domain.IndexType;
+import org.apache.coyote.BadRequestException;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.rio.Rio;
 import org.slf4j.Logger;
@@ -14,21 +17,38 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URISyntaxException;
 import java.util.*;
 
 @Service
 public class MetadataManagerServices implements MetadataManager {
     private static final Logger logger = LoggerFactory.getLogger(MetadataManagerServices.class);
 
-    public final Map<UUID, Model> inMemoryModels;
+    public final Map<UUID, Model> inMemoryModels = new HashMap<>();
+    public final IndexService indexService;
 
-    public MetadataManagerServices(Map<UUID, Model> inMemoryModels) {
-        this.inMemoryModels = inMemoryModels;
+    public MetadataProviderServices(IndexService indexService) {
+        this.indexService = indexService;
     }
 
     @Override
     public Optional<Model> getMetadata(UUID id) {
         return Optional.ofNullable(inMemoryModels.get(id));
+    }
+
+    @Override
+    public void retrieveMetadata(){
+        logger.info("retrieving metadata");
+
+        // Gets all indexes with Pull type
+        var indexes = indexService.getAllByType(IndexType.PULL);
+        if(indexes.isEmpty()){
+            throw new NoSuchElementException("FDP pull index list is empty, please add indexes before retrieving data.");
+        }
+
+        indexes.forEach(index -> {
+            // add harvest logic
+        });
     }
 
     @Override
@@ -41,6 +61,13 @@ public class MetadataManagerServices implements MetadataManager {
         var model = Rio.parse(reader, "", format);
         var uuid = UUID.randomUUID();
 
+        // Finds index with Push type matching origin URL
+        var index = indexService.findByOrigin(origin);
+        if(index.isEmpty()){
+            throw new BadRequestException("provided origin does not exist in FDP");
+        }
+
+        // Saves metadata to in memory map
         inMemoryModels.put(uuid, model);
         logger.info("Successfully uploaded metadata. Total models: {}", inMemoryModels.size());
 

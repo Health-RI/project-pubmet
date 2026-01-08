@@ -6,9 +6,11 @@
 package nl.healthri.pubmet.core.services;
 
 import nl.healthri.pubmet.core.domain.Index;
+import nl.healthri.pubmet.core.domain.IndexType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import java.util.*;
 
 @Service
@@ -25,11 +27,29 @@ public class IndexService {
     }
 
     public Index findById(UUID id) {
-        Index found = inMemoryIndexes.get(id);
+        var found = inMemoryIndexes.get(id);
         if (found == null) {
             throw new NoSuchElementException("Index not found with ID: " + id);
         }
 
         return found;
+    }
+
+    public Optional<Index> findByOrigin(String origin) {
+        if (origin == null || origin.isBlank()) {
+            return Optional.empty();
+        }
+
+        return inMemoryIndexes.values().stream()
+                .filter(index -> index.url != null && index.url.toString().equals(origin))
+                .findFirst();
+    }
+
+    public List<Index> getAll(){
+        return inMemoryIndexes.values().stream().toList();
+    }
+
+    public List<Index> getAllByType(IndexType type){
+        return inMemoryIndexes.values().stream().filter(index -> index.type.equals(type)).toList();
     }
 }
