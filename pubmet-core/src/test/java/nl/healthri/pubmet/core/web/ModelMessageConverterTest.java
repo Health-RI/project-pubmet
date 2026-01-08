@@ -48,7 +48,10 @@ class ModelMessageConverterTest {
     void GivenValidModel_WhenWriteInternal_ReturnModelContentAsBody() throws IOException {
         // Arrange
         var converter = new ModelMessageConverter(RDFFormat.TURTLE);
-        var expected = "\r\n<http://example.com> <http://www.w3.org/2000/01/rdf-schema#label> \"hello world\" .\r\n";
+        var expected = """
+                
+                <http://example.com> <http://www.w3.org/2000/01/rdf-schema#label> "hello world" .
+                """.stripIndent();
         var model = createSampleModel();
         var message = new MockHttpOutputMessage();
 
