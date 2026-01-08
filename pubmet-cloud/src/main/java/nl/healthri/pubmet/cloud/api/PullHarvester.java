@@ -8,7 +8,7 @@ package nl.healthri.pubmet.cloud.api;
 import java.net.URL;
 
 // TODO consider moving to a separate module
-public interface Harvester {
+public interface PullHarvester {
     // TODO refine the method signature
     void harvest(URL endpoint);
 }
