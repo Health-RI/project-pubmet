@@ -24,13 +24,14 @@ import tools.jackson.databind.ObjectMapper;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class IndexControllerTest {
+class IndexControllerTest {
     @Autowired
     private MockMvc mvc;
     @Autowired
@@ -50,7 +51,7 @@ public class IndexControllerTest {
     }
 
     @Test
-    public void GivenValidIndex_WhenCreatingIndex_ReturnCreatedStatus() throws Exception {
+    void GivenValidIndex_WhenCreatingIndex_ReturnCreatedStatus() throws Exception {
         // Arrange
         var index = createSampleIndex();
         var jsonBody = objectMapper.writeValueAsString(index);
@@ -66,7 +67,7 @@ public class IndexControllerTest {
     }
 
     @Test
-    public void GivenInvalidIndex_WhenCreatingIndex_ReturnBadRequestStatus() throws Exception {
+    void GivenInvalidIndex_WhenCreatingIndex_ReturnBadRequestStatus() throws Exception {
         // Arrange
         var jsonBody = objectMapper.writeValueAsString(null);
 
@@ -81,12 +82,32 @@ public class IndexControllerTest {
     }
 
     @Test
-    public void GivenExistingIndex_WhenFindingIndexById_ReturnOkWithIndex(){
+    void GivenExistingIndex_WhenFindingIndexById_ReturnOkWithIndex() throws Exception {
+        // Arrange
+        var index = createSampleIndex();
+        var expectedJson = objectMapper.writeValueAsString(index);
 
+        Mockito.when(indexService.findById(index.id))
+                .thenReturn(index);
+
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.get("/index/{id}", index.id)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedJson));
     }
 
     @Test
-    public void GivenNonExistentIndex_WhenFindingIndexById_ReturnNotFoundResponseStatus(){
+    void GivenNonExistentIndex_WhenFindingIndexById_ReturnNotFoundResponseStatus() throws Exception {
+        // Arrange
+        var randomId = UUID.randomUUID();
 
+        Mockito.when(indexService.findById(randomId))
+                .thenThrow(new NoSuchElementException("Index not found"));
+
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.get("/index/{id}", randomId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }
