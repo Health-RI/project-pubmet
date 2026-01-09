@@ -6,7 +6,7 @@
 package nl.healthri.pubmet.core.services;
 
 import nl.healthri.pubmet.core.api.MetadataProvider;
-import nl.healthri.pubmet.core.domain.IndexType;
+import nl.healthri.pubmet.core.domain.Index;
 import org.apache.coyote.BadRequestException;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.rio.Rio;
@@ -31,24 +31,17 @@ public class MetadataProviderServices implements MetadataProvider {
     }
 
     @Override
-    public Optional<Model> getMetadata(@NonNull UUID id) {
+    public Optional<Model> getMetadataById(@NonNull UUID id) {
+        logger.info("getting metadata by id {}", id);
         return Optional.ofNullable(inMemoryModels.get(id));
     }
 
     @Override
-    public void retrieveMetadata(){
+    public List<Model> pullMetadata(Index index){
         logger.info("retrieving metadata");
-
-        // Gets all indexes with Pull type
-        var indexes = indexService.getAllByType(IndexType.PULL);
-        if(indexes.isEmpty()){
-            throw new NoSuchElementException("FDP pull index list is empty, please add indexes before retrieving data.");
-        }
-
-        indexes.forEach(index -> {
-            // add harvest logic
-        });
+        return inMemoryModels.values().stream().toList();
     }
+
 
     @Override
     public void uploadMetadata(@NonNull String body, @NonNull String contentType, @NonNull String origin) throws IOException, URISyntaxException {

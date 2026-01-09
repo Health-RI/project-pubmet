@@ -5,16 +5,17 @@
  */
 package nl.healthri.pubmet.core.api;
 
-import org.apache.coyote.BadRequestException;
+import nl.healthri.pubmet.core.domain.Index;
 import org.eclipse.rdf4j.model.Model;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface MetadataProvider {
-    Optional<Model> getMetadata(UUID id);
-    void retrieveMetadata() throws BadRequestException;
+    Optional<Model> getMetadataById(UUID id);
+    List<Model> pullMetadata(Index index);
     void uploadMetadata(String body, String contentType, String origin) throws IOException, URISyntaxException;
 }

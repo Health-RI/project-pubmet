@@ -6,6 +6,7 @@
 package nl.healthri.pubmet.core.web.controller;
 
 import nl.healthri.pubmet.core.api.MetadataProvider;
+import nl.healthri.pubmet.core.domain.Index;
 import org.eclipse.rdf4j.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -28,12 +30,20 @@ public class MetadataController {
         this.provider = provider;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Model> getMetadata(@PathVariable UUID id) {
-        logger.info("Got a request for metadata with id {}", id);
 
-        var model = provider.getMetadata(id);
+    @GetMapping("/{id}")
+    public ResponseEntity<Model> getMetadataById(@PathVariable UUID id) {
+        logger.info("Received request to retrieve metadata with id {}", id);
+
+        var model = provider.getMetadataById(id);
         return ResponseEntity.of(model);
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<Model>> pullMetadata(Index index) {
+        logger.info("Received request to retrieve metadata");
+        var models = provider.getMetadata();
+        return ResponseEntity.ok(models);
     }
 
     @PostMapping()

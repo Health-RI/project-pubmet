@@ -85,7 +85,7 @@ class MetadataProviderServicesTest {
         var id = UUID.randomUUID();
 
         // Act
-        var result = metadataProviderService.getMetadata(id);
+        var result = metadataProviderService.getMetadataById(id);
 
         // Assert
         assertTrue(result.isEmpty());

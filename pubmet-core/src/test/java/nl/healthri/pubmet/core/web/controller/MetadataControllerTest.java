@@ -27,18 +27,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class MetadataControllerTest {
+class MetadataControllerTest {
     @MockitoBean
     MetadataProvider provider;
 
     @Test
-    public void testMetadataRetrieval(@Autowired MockMvc mvc) throws Exception {
+     void testMetadataRetrieval(@Autowired MockMvc mvc) throws Exception {
         // Arrange
         var expected = TestConstants.TEST_TURTLE;
 
         // Act
         UUID id = UUID.randomUUID();
-        BDDMockito.given(provider.getMetadata(id)).
+        BDDMockito.given(provider.getMetadataById(id)).
                 willReturn(Optional.ofNullable(TestConstants.TEST_MODEL));
 
         // Assert
@@ -52,7 +52,7 @@ public class MetadataControllerTest {
     }
 
     @Test
-    public void GivenNewMetadata_WhenUploadMetadata_ReturnStatusCreated(@Autowired MockMvc mvc) throws Exception {
+    void GivenNewMetadata_WhenUploadMetadata_ReturnStatusCreated(@Autowired MockMvc mvc) throws Exception {
         // Arrange
         var contentType = MimeTypeUtils.APPLICATION_JSON.toString();
         var modelContent = TestConstants.TEST_TURTLE;
