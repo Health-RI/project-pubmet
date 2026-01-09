@@ -26,7 +26,7 @@ public class IndexService {
         return index;
     }
 
-    public Index findById(UUID id) {
+    public Index findById(UUID id) throws NoSuchElementException {
         var found = inMemoryIndexes.get(id);
         if (found == null) {
             throw new NoSuchElementException("Index not found with ID: " + id);
