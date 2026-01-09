@@ -27,12 +27,8 @@ public class IndexService {
     }
 
     public Index findById(UUID id) throws NoSuchElementException {
-        var found = inMemoryIndexes.get(id);
-        if (found == null) {
-            throw new NoSuchElementException("Index not found with ID: " + id);
-        }
-
-        return found;
+        return Optional.ofNullable(inMemoryIndexes.get(id))
+                .orElseThrow(() -> new NoSuchElementException("Index not found with ID: " + id));
     }
 
     public Optional<Index> findByOrigin(String origin) {
