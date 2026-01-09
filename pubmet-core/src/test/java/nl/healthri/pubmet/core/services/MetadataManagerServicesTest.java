@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
@@ -32,17 +33,33 @@ class MetadataManagerServicesTest {
         metadataManagerService = new MetadataManagerServices(indexService);
     }
 
+    public Index createSampleIndex() throws URISyntaxException, MalformedURLException {
+        return new Index(
+                UUID.randomUUID(),
+                new URI("http://healthri.nl/").toURL(),
+                "Health-RI",
+                IndexType.PUSH
+        );
+    }
+
     @Test
-    void GivenValidModel_WhenUploadMetadata_ThenSaveModel(){
+    void GivenValidModel_WhenUploadMetadata_ThenSaveModel() throws IOException, URISyntaxException {
         // Arrange
+        var index = createSampleIndex();
         var modelContent = TestConstants.TEST_TURTLE;
         var contentType = "text/turtle";
         var origin = "https://www.health-ri.nl/";
+        var expectedMapSize = 1;
 
-        // Act & Assert
-        assertDoesNotThrow(() ->
-                metadataManagerService.uploadMetadata(modelContent, contentType, origin)
-        );
+        Mockito.when(metadataManagerService.indexService
+                        .findByOrigin(anyString()))
+                .thenReturn(Optional.of(index));
+
+        // Act
+        metadataManagerService.uploadMetadata(modelContent, contentType, origin);
+
+        // Assert
+        assertEquals(expectedMapSize, metadataManagerService.inMemoryModels.size());
     }
 
     @Test
@@ -73,12 +90,10 @@ class MetadataManagerServicesTest {
     @Test
     void GivenExistingModel_WhenGettingMetadata_ReturnModel() throws IOException, URISyntaxException {
         // Arrange
-        var url = URI.create("https://www.health-ri.nl/").toURL();
-        var index = new Index(UUID.randomUUID(), url, "Health-RI", IndexType.PUSH);
-
+        var index = createSampleIndex();
         var contentType = "text/turtle";
-        var expectedMapSize = 1;
         var origin = "https://www.health-ri.nl/";
+        var expectedMapSize = 1;
 
         // Act
         Mockito.when(metadataManagerService.indexService
