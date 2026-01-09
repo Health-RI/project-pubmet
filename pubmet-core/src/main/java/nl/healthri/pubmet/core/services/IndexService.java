@@ -45,10 +45,6 @@ public class IndexService {
                 .findFirst();
     }
 
-    public List<Index> getAll(){
-        return inMemoryIndexes.values().stream().toList();
-    }
-
     public List<Index> getAllByType(IndexType type){
         return inMemoryIndexes.values().stream().filter(index -> index.type.equals(type)).toList();
     }
