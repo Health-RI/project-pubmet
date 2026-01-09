@@ -33,7 +33,7 @@ public class IndexServiceTest {
     public Index createSampleIndex() throws URISyntaxException, MalformedURLException {
         return new Index(
                 UUID.randomUUID(),
-                new URI("http://healthri.nl/").toURL(),
+                new URI("https://www.health-ri.nl/").toURL(),
                 "Health-RI",
                 IndexType.PUSH
         );
@@ -83,5 +83,34 @@ public class IndexServiceTest {
 
         // Act & Assert
         assertThrows(NoSuchElementException.class, () -> indexService.findById(nonExistentId));
+    }
+
+    @Test
+    public void GivenExistingIndex_WhenFindingIndexByOrigin_ReturnIndex() throws MalformedURLException, URISyntaxException {
+        // Arrange
+        var index = createSampleIndex();
+        var origin = "https://www.health-ri.nl/";
+
+        // Act
+        indexService.inMemoryIndexes.put(index.id, index);
+        var found = indexService.findByOrigin(origin);
+
+        // Assert
+        assertTrue(found.isPresent());
+
+        var indexFound = found.get();
+        assertEquals(index.id, indexFound.id);
+        assertEquals(index.url, indexFound.url);
+        assertEquals(index.organization, indexFound.organization);
+    }
+
+    @Test
+    public void GivenNonExistentIndex_WhenFindingIndexByOrigin_ReturnNotFoundException() {
+        // Arrange
+        var nonExistentOrigin = "https://www.example.nl/";
+
+        // Act & Assert
+        var found = indexService.findByOrigin(nonExistentOrigin);
+        assertTrue(found.isEmpty());
     }
 }
