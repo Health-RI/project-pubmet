@@ -5,7 +5,7 @@
  */
 package nl.healthri.pubmet.core.services;
 
-import nl.healthri.pubmet.core.api.MetadataProvider;
+import nl.healthri.pubmet.core.api.MetadataManager;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.rio.Rio;
 import org.jspecify.annotations.NonNull;
@@ -18,10 +18,14 @@ import java.io.StringReader;
 import java.util.*;
 
 @Service
-public class MetadataProviderServices implements MetadataProvider {
-    private static final Logger logger = LoggerFactory.getLogger(MetadataProviderServices.class);
+public class MetadataManagerServices implements MetadataManager {
+    private static final Logger logger = LoggerFactory.getLogger(MetadataManagerServices.class);
 
-    public final Map<UUID, Model> inMemoryModels = new HashMap<>();
+    public final Map<UUID, Model> inMemoryModels;
+
+    public MetadataManagerServices(Map<UUID, Model> inMemoryModels) {
+        this.inMemoryModels = inMemoryModels;
+    }
 
     @Override
     public Optional<Model> getMetadata(@NonNull UUID id) {
@@ -29,7 +33,7 @@ public class MetadataProviderServices implements MetadataProvider {
     }
 
     @Override
-    public void uploadMetadata(@NonNull String body, @NonNull String contentType) throws IOException {
+    public Model uploadMetadata(@NonNull String body, @NonNull String contentType) throws IOException {
         logger.info("Uploading metadata");
 
         var reader = new StringReader(body);
@@ -40,5 +44,8 @@ public class MetadataProviderServices implements MetadataProvider {
 
         inMemoryModels.put(uuid, model);
         logger.info("Successfully uploaded metadata. Total models: {}", inMemoryModels.size());
+
+        return model;
     }
+
 }

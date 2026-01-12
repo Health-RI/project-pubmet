@@ -5,7 +5,7 @@
  */
 package nl.healthri.pubmet.core.web.controller;
 
-import nl.healthri.pubmet.core.api.MetadataProvider;
+import nl.healthri.pubmet.core.api.MetadataManager;
 import org.eclipse.rdf4j.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,17 +13,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.UUID;
 
 
 @RestController
 @RequestMapping
-public class MetadataController {
-    private static final Logger logger = LoggerFactory.getLogger(nl.healthri.pubmet.core.web.controller.MetadataController.class);
+public class MetadataManagerController {
+    private static final Logger logger = LoggerFactory.getLogger(MetadataManagerController.class);
 
-    private final MetadataProvider provider;
+    private final MetadataManager provider;
 
-    public MetadataController(MetadataProvider provider) {
+    public MetadataManagerController(MetadataManager provider) {
         this.provider = provider;
     }
 
@@ -35,8 +36,8 @@ public class MetadataController {
         return ResponseEntity.of(model);
     }
 
-    @PostMapping()
-    public ResponseEntity<Void> uploadMetadata(
+    @PostMapping
+    public ResponseEntity<String> uploadMetadata(
             @RequestBody String body,
             @RequestHeader("Content-Type") String contentType){
         logger.info("Received request to upload metadata containing");
@@ -45,9 +46,10 @@ public class MetadataController {
             provider.uploadMetadata(body, contentType);
 
             return ResponseEntity.status(HttpStatus.CREATED).build();
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.error("Failed to upload metadata", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Failed to upload metadata: " + e.getMessage());
         }
     }
 }
