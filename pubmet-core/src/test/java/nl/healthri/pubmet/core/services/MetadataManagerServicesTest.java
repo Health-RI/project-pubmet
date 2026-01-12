@@ -1,22 +1,24 @@
 package nl.healthri.pubmet.core.services;
 
 import nl.healthri.pubmet.core.TestConstants;
-import org.apache.coyote.BadRequestException;
+import org.eclipse.rdf4j.model.Model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MetadataProviderServicesTest {
+class MetadataManagerServicesTest {
 
-    private MetadataProviderServices service;
+    private MetadataManagerServices service;
 
     @BeforeEach
     void setUp() {
-        service = new MetadataProviderServices();
+        var inMemoryModels = new HashMap<UUID, Model>();
+        service = new MetadataManagerServices(inMemoryModels);
     }
 
     @Test
@@ -67,4 +69,5 @@ class MetadataProviderServicesTest {
         // Assert
         assertEquals(expectedMapSize, service.inMemoryModels.size());
     }
+
 }

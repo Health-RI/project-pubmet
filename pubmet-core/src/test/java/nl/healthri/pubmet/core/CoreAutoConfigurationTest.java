@@ -5,7 +5,7 @@
  */
 package nl.healthri.pubmet.core;
 
-import nl.healthri.pubmet.core.api.MetadataProvider;
+import nl.healthri.pubmet.core.api.MetadataManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 public class CoreAutoConfigurationTest {
     @MockitoBean
-    MetadataProvider provider;
+    MetadataManager provider;
 
     @Test
     public void testAutoConfigurationLoaded(@Autowired ApplicationContext applicationContext) {

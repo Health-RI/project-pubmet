@@ -6,7 +6,9 @@
 package nl.healthri.pubmet.core.web.controller;
 
 import nl.healthri.pubmet.core.TestConstants;
-import nl.healthri.pubmet.core.api.MetadataProvider;
+import nl.healthri.pubmet.core.api.MetadataManager;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.Rio;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
@@ -17,6 +19,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.MimeTypeUtils;
 
+import java.io.StringReader;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,27 +29,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class MetadataControllerTest {
+public class MetadataManagerControllerTest {
     @MockitoBean
-    MetadataProvider provider;
+    MetadataManager provider;
 
     @Test
     public void testMetadataRetrieval(@Autowired MockMvc mvc) throws Exception {
         // Arrange
-        var expected = TestConstants.TEST_TURTLE;
+        var expectedModel = TestConstants.TEST_MODEL;
+        var id = UUID.randomUUID();
 
-        // Act
-        UUID id = UUID.randomUUID();
-        BDDMockito.given(provider.getMetadata(id)).
-                willReturn(Optional.ofNullable(TestConstants.TEST_MODEL));
+        BDDMockito.given(provider.getMetadata(id))
+                .willReturn(Optional.of(expectedModel));
 
-        // Assert
+        // Act & Assert
         mvc.perform(get("/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("text/turtle"))
                 .andExpect(result -> {
-                    var actual = result.getResponse().getContentAsString().trim();
-                    Assertions.assertEquals(actual, expected);
+                    var content = result.getResponse().getContentAsString();
+
+                    var actual = Rio.parse(
+                            new StringReader(content),
+                            "",
+                            RDFFormat.TURTLE
+                    );
+
+                    Assertions.assertEquals(expectedModel, actual);
                 });
     }
 
@@ -56,15 +65,12 @@ public class MetadataControllerTest {
         var contentType = MimeTypeUtils.APPLICATION_JSON.toString();
         var modelContent = TestConstants.TEST_TURTLE;
 
-        var expectedStatus = status().isCreated();
-
         // Act & Assert
         var request = post("/")
                 .content(modelContent)
                 .contentType(contentType);
 
         mvc.perform(request)
-                .andExpect(expectedStatus)
                 .andExpect(status().isCreated());
     }
 }
