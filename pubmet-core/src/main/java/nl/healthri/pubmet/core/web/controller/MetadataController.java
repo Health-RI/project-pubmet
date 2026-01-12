@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-
 @RestController
 @RequestMapping(path = "metadata")
 public class MetadataController {
@@ -42,7 +41,7 @@ public class MetadataController {
     @GetMapping()
     public ResponseEntity<List<Model>> pullMetadata(Index index) {
         logger.info("Received request to retrieve metadata");
-        var models = provider.getMetadata();
+        var models = provider.pullMetadata(index);
         return ResponseEntity.ok(models);
     }
 
