@@ -10,10 +10,13 @@ import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.util.Values;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.Rio;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.mock.http.MockHttpOutputMessage;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -48,16 +51,22 @@ class ModelMessageConverterTest {
     void GivenValidModel_WhenWriteInternal_ReturnModelContentAsBody() throws IOException {
         // Arrange
         var converter = new ModelMessageConverter(RDFFormat.TURTLE);
-        var expected = "\r\n<http://example.com> <http://www.w3.org/2000/01/rdf-schema#label> \"hello world\" .\r\n";
-        var model = createSampleModel();
+        var expectedModel = createSampleModel();
         var message = new MockHttpOutputMessage();
 
         // Act
-        converter.writeInternal(model, message);
+        converter.writeInternal(expectedModel, message);
 
         // Assert
-        var actual = message.getBodyAsString();
-        assertEquals(expected, actual);
+        var messageContent = message.getBodyAsString();
+        var actual = Rio.parse(
+                new StringReader(messageContent),
+                "",
+                RDFFormat.TURTLE
+        );
+
+        assertNotNull(actual);
+        assertEquals(expectedModel, actual);
     }
 
 
@@ -86,11 +95,10 @@ class ModelMessageConverterTest {
 
         // Assert
         var actualMimeTypes = converter.getSupportedMediaTypes();
-
         assertEquals(expectedMimeTypes.size(), actualMimeTypes.size(), "Should have the same number of media types as the RDF format");
-
         for (String mimeType : expectedMimeTypes) {
-            assertTrue(actualMimeTypes.stream().anyMatch(mediaType -> mediaType.toString().equals(mimeType)) );
+            assertTrue(actualMimeTypes.stream().map(MediaType::toString).anyMatch(mimeType::equals));
         }
     }
+
 }

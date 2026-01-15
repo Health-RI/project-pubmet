@@ -33,7 +33,7 @@ public class ModelMessageConverter extends AbstractHttpMessageConverter<Model> {
     }
 
     @Override
-    protected Model readInternal(Class<? extends Model> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
+    protected Model readInternal(Class<? extends Model> clazz, HttpInputMessage inputMessage) throws HttpMessageNotReadableException {
         return null;
     }
 
