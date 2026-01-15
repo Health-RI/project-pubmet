@@ -6,7 +6,6 @@
 package nl.healthri.pubmet.core.services;
 
 import nl.healthri.pubmet.core.api.MetadataManager;
-import nl.healthri.pubmet.core.api.MetadataProvider;
 import nl.healthri.pubmet.core.domain.IndexType;
 import org.apache.coyote.BadRequestException;
 import org.eclipse.rdf4j.model.Model;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.net.URISyntaxException;
 import java.util.*;
 
 @Service
@@ -27,7 +25,7 @@ public class MetadataManagerServices implements MetadataManager {
     public final Map<UUID, Model> inMemoryModels = new HashMap<>();
     public final IndexService indexService;
 
-    public MetadataProviderServices(IndexService indexService) {
+    public MetadataManagerServices(IndexService indexService) {
         this.indexService = indexService;
     }
 
@@ -52,7 +50,7 @@ public class MetadataManagerServices implements MetadataManager {
     }
 
     @Override
-    public Model uploadMetadata(String body, String contentType) throws IOException {
+    public Model uploadMetadata(String body, String contentType, String origin) throws IOException {
         logger.info("Uploading metadata");
 
         var reader = new StringReader(body);

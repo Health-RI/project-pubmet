@@ -8,19 +8,21 @@ package nl.healthri.pubmet.core.services;
 import nl.healthri.pubmet.core.TestConstants;
 import nl.healthri.pubmet.core.domain.Index;
 import nl.healthri.pubmet.core.domain.IndexType;
-import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
-import java.util.HashMap;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 
 @SpringBootTest
 class MetadataManagerServicesTest {

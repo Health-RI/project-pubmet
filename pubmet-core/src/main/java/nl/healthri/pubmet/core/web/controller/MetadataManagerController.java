@@ -19,7 +19,7 @@ import java.util.UUID;
 
 
 @RestController
-@RequestMapping
+@RequestMapping("/metadata")
 public class MetadataManagerController {
     private static final Logger logger = LoggerFactory.getLogger(MetadataManagerController.class);
 
