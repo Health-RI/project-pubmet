@@ -8,7 +8,6 @@ package nl.healthri.pubmet.core.services;
 import nl.healthri.pubmet.core.api.MetadataManager;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.rio.Rio;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -28,12 +27,12 @@ public class MetadataManagerServices implements MetadataManager {
     }
 
     @Override
-    public Optional<Model> getMetadata(@NonNull UUID id) {
+    public Optional<Model> getMetadata(UUID id) {
         return Optional.ofNullable(inMemoryModels.get(id));
     }
 
     @Override
-    public Model uploadMetadata(@NonNull String body, @NonNull String contentType) throws IOException {
+    public Model uploadMetadata(String body, String contentType) throws IOException {
         logger.info("Uploading metadata");
 
         var reader = new StringReader(body);
