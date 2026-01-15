@@ -1,0 +1,15 @@
+---
+repos:
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.9.1
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+  - repo: local
+    hooks:
+      - id: mvn-validate
+        name: Run maven checks
+        entry: mvn -q -ff tidy:check com.mycila:license-maven-plugin:check clean verify
+        language: system
+        pass_filenames: false
+        always_run: true

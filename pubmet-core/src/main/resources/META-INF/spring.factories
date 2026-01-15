@@ -1,0 +1,2 @@
+org.springframework.context.ApplicationContextInitializer=\
+nl.healthri.pubmet.core.web.ModelMessageConverterContextInitializer
