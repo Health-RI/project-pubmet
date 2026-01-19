@@ -16,5 +16,5 @@ public interface MetadataManager {
 
     void retrieveMetadata();
 
-    Model uploadMetadata(String body, String contentType, String origin) throws IOException;
+    Model uploadMetadata(Model body, String origin) throws IOException;
 }

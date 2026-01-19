@@ -32,7 +32,7 @@ public class IndexService {
     }
 
     public Optional<Index> findByOrigin(String origin) {
-        if (origin == null || origin.isBlank()) {
+        if (origin.isBlank()) {
             return Optional.empty();
         }
 
@@ -44,4 +44,5 @@ public class IndexService {
     public List<Index> getAllByType(IndexType type){
         return inMemoryIndexes.values().stream().filter(index -> index.type.equals(type)).toList();
     }
+
 }
