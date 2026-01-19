@@ -1,47 +1,82 @@
+/*
+ * SPDX-FileCopyrightText: 2025 Health-RI
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package nl.healthri.pubmet.core.services;
 
-import nl.healthri.pubmet.core.TestConstants;
+import nl.healthri.pubmet.core.domain.Index;
+import nl.healthri.pubmet.core.domain.IndexType;
 import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.impl.LinkedHashModel;
+import org.eclipse.rdf4j.model.util.Values;
+import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Optional;
 import java.util.UUID;
 
+import static nl.healthri.pubmet.core.TestConstants.TEST_INVALID_MODEL;
+import static nl.healthri.pubmet.core.TestConstants.TEST_MODEL;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 
+@SpringBootTest
 class MetadataManagerServicesTest {
-
-    private MetadataManagerServices service;
+    @MockitoBean
+    private IndexService indexService;
+    private MetadataManagerServices metadataManagerService;
 
     @BeforeEach
     void setUp() {
-        var inMemoryModels = new HashMap<UUID, Model>();
-        service = new MetadataManagerServices(inMemoryModels);
+        metadataManagerService = new MetadataManagerServices(indexService);
+    }
+
+    public Index createSampleIndex() throws URISyntaxException, MalformedURLException {
+        return new Index(
+                UUID.randomUUID(),
+                new URI("http://healthri.nl/").toURL(),
+                "Health-RI",
+                IndexType.PUSH
+        );
     }
 
     @Test
-    void GivenValidModel_WhenUploadMetadata_ThenSaveModel(){
+    void GivenModel_WhenUploadMetadata_ThenSaveModel() throws IOException, URISyntaxException {
         // Arrange
-        var modelContent = TestConstants.TEST_TURTLE;
-        var contentType = "text/turtle";
+        var index = createSampleIndex();
+        var model = TEST_MODEL;
+        var origin = "https://www.health-ri.nl/";
+        var expectedMapSize = 1;
 
-        // Act & Assert
-        assertDoesNotThrow(() ->
-                service.uploadMetadata(modelContent, contentType)
-        );
+        Mockito.when(metadataManagerService.indexService
+                        .findByOrigin(anyString()))
+                .thenReturn(Optional.of(index));
+
+        // Act
+        metadataManagerService.uploadMetadata(model, origin);
+
+        // Assert
+        assertEquals(expectedMapSize, metadataManagerService.inMemoryModels.size());
     }
 
     @Test
     void GivenInvalidModel_WhenUploadMetadata_ThenThrowIOException(){
         // Arrange
-        var data = "some random data";
-        var invalidType = "application/not-real";
+        var origin = "https://www.health-ri.nl/";
+        var model = TEST_INVALID_MODEL;
 
         // Act & Assert
         assertThrows(IOException.class, () ->
-                service.uploadMetadata(data, invalidType)
+                metadataManagerService.uploadMetadata(model, origin)
         );
     }
 
@@ -51,23 +86,29 @@ class MetadataManagerServicesTest {
         var id = UUID.randomUUID();
 
         // Act
-        var result = service.getMetadata(id);
+        var result = metadataManagerService.getMetadata(id);
 
         // Assert
         assertTrue(result.isEmpty());
     }
 
     @Test
-    void GivenExistingModel_WhenGettingMetadata_ReturnModel() throws IOException {
+    void GivenExistingModel_WhenGettingMetadata_ReturnModel() throws IOException, URISyntaxException {
         // Arrange
-        var contentType = "text/turtle";
+        var index = createSampleIndex();
+        var model = TEST_MODEL;
+        var origin = "https://www.health-ri.nl/";
         var expectedMapSize = 1;
 
         // Act
-        service.uploadMetadata(TestConstants.TEST_TURTLE, contentType);
+        Mockito.when(metadataManagerService.indexService
+                .findByOrigin(anyString()))
+                .thenReturn(Optional.of(index));
+
+        metadataManagerService.uploadMetadata(model, origin);
 
         // Assert
-        assertEquals(expectedMapSize, service.inMemoryModels.size());
+        assertEquals(expectedMapSize, metadataManagerService.inMemoryModels.size());
     }
 
 }

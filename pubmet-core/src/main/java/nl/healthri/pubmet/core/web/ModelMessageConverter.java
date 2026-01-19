@@ -33,8 +33,13 @@ public class ModelMessageConverter extends AbstractHttpMessageConverter<Model> {
     }
 
     @Override
-    protected Model readInternal(Class<? extends Model> clazz, HttpInputMessage inputMessage) throws HttpMessageNotReadableException {
-        return null;
+    protected Model readInternal(Class<? extends Model> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
+        try (var stream = inputMessage.getBody()) {
+            // TODO handle/set base uri
+            return Rio.parse(stream, format);
+        } catch (RDFHandlerException e) {
+            throw new HttpMessageNotReadableException("Could not parse RDF body", e, inputMessage);
+        }
     }
 
     @Override
