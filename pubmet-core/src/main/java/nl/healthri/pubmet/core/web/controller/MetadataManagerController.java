@@ -39,14 +39,13 @@ public class MetadataManagerController {
 
     @PostMapping
     public ResponseEntity<String> uploadMetadata(
-            @RequestBody String body,
-            @RequestHeader(HttpHeaders.CONTENT_TYPE) String contentType,
+            @RequestBody Model body,
             @RequestHeader(HttpHeaders.ORIGIN) String origin)
     {
         logger.info("Received request to upload metadata containing");
 
         try {
-            provider.uploadMetadata(body, contentType, origin);
+            provider.uploadMetadata(body, origin);
 
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (IOException e) {

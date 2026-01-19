@@ -9,13 +9,11 @@ import nl.healthri.pubmet.core.api.MetadataManager;
 import nl.healthri.pubmet.core.domain.IndexType;
 import org.apache.coyote.BadRequestException;
 import org.eclipse.rdf4j.model.Model;
-import org.eclipse.rdf4j.rio.Rio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.*;
 
 @Service
@@ -50,13 +48,9 @@ public class MetadataManagerServices implements MetadataManager {
     }
 
     @Override
-    public Model uploadMetadata(String body, String contentType, String origin) throws IOException {
+    public Model uploadMetadata(Model model, String origin) throws IOException {
         logger.info("Uploading metadata");
 
-        var reader = new StringReader(body);
-        var format = Rio.getParserFormatForMIMEType(contentType)
-                .orElseThrow(() -> new IOException("Unsupported content type: " + contentType));
-        var model = Rio.parse(reader, "", format);
         var uuid = UUID.randomUUID();
 
         // Finds index with Push type matching origin URL
