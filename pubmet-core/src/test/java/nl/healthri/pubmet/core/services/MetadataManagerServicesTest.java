@@ -5,9 +5,12 @@
  */
 package nl.healthri.pubmet.core.services;
 
-import nl.healthri.pubmet.core.TestConstants;
 import nl.healthri.pubmet.core.domain.Index;
 import nl.healthri.pubmet.core.domain.IndexType;
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.impl.LinkedHashModel;
+import org.eclipse.rdf4j.model.util.Values;
+import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -21,6 +24,8 @@ import java.net.URISyntaxException;
 import java.util.Optional;
 import java.util.UUID;
 
+import static nl.healthri.pubmet.core.TestConstants.TEST_INVALID_MODEL;
+import static nl.healthri.pubmet.core.TestConstants.TEST_MODEL;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 
@@ -45,11 +50,10 @@ class MetadataManagerServicesTest {
     }
 
     @Test
-    void GivenValidModel_WhenUploadMetadata_ThenSaveModel() throws IOException, URISyntaxException {
+    void GivenModel_WhenUploadMetadata_ThenSaveModel() throws IOException, URISyntaxException {
         // Arrange
         var index = createSampleIndex();
-        var modelContent = TestConstants.TEST_TURTLE;
-        var contentType = "text/turtle";
+        var model = TEST_MODEL;
         var origin = "https://www.health-ri.nl/";
         var expectedMapSize = 1;
 
@@ -58,7 +62,7 @@ class MetadataManagerServicesTest {
                 .thenReturn(Optional.of(index));
 
         // Act
-        metadataManagerService.uploadMetadata(modelContent, contentType, origin);
+        metadataManagerService.uploadMetadata(model, origin);
 
         // Assert
         assertEquals(expectedMapSize, metadataManagerService.inMemoryModels.size());
@@ -67,13 +71,12 @@ class MetadataManagerServicesTest {
     @Test
     void GivenInvalidModel_WhenUploadMetadata_ThenThrowIOException(){
         // Arrange
-        var data = "some random data";
-        var invalidType = "application/not-real";
         var origin = "https://www.health-ri.nl/";
+        var model = TEST_INVALID_MODEL;
 
         // Act & Assert
         assertThrows(IOException.class, () ->
-                metadataManagerService.uploadMetadata(data, invalidType, origin)
+                metadataManagerService.uploadMetadata(model, origin)
         );
     }
 
@@ -93,7 +96,7 @@ class MetadataManagerServicesTest {
     void GivenExistingModel_WhenGettingMetadata_ReturnModel() throws IOException, URISyntaxException {
         // Arrange
         var index = createSampleIndex();
-        var contentType = "text/turtle";
+        var model = TEST_MODEL;
         var origin = "https://www.health-ri.nl/";
         var expectedMapSize = 1;
 
@@ -102,7 +105,7 @@ class MetadataManagerServicesTest {
                 .findByOrigin(anyString()))
                 .thenReturn(Optional.of(index));
 
-        metadataManagerService.uploadMetadata(TestConstants.TEST_TURTLE, contentType, origin);
+        metadataManagerService.uploadMetadata(model, origin);
 
         // Assert
         assertEquals(expectedMapSize, metadataManagerService.inMemoryModels.size());
