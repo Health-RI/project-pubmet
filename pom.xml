@@ -32,7 +32,7 @@
         <java.version>25</java.version>
 
         <!-- library version management -->
-        <rdf4j.version>5.2.2</rdf4j.version>
+        <rdf4j.version>5.3.1</rdf4j.version>
 
         <!-- test version management -->
         <groovy.version>5.0.2</groovy.version>
