@@ -1,0 +1,113 @@
+/*
+ * SPDX-FileCopyrightText: 2025 Health-RI
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+package nl.healthri.pubmet.core.web.controller;
+
+import nl.healthri.pubmet.core.domain.Index;
+import nl.healthri.pubmet.core.domain.IndexType;
+import nl.healthri.pubmet.core.services.IndexService;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import tools.jackson.databind.ObjectMapper;
+
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.NoSuchElementException;
+import java.util.UUID;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+class IndexControllerTest {
+    @Autowired
+    private MockMvc mvc;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @MockitoBean
+    private IndexService indexService;
+    @InjectMocks
+    private IndexController indexController;
+
+    public Index createSampleIndex() throws URISyntaxException, MalformedURLException {
+        return new Index(
+                UUID.randomUUID(),
+                new URI("http://healthri.nl/").toURL(),
+                "Health-RI",
+                IndexType.PUSH
+        );
+    }
+
+    @Test
+    void GivenValidIndex_WhenCreatingIndex_ReturnCreatedStatus() throws Exception {
+        // Arrange
+        var index = createSampleIndex();
+        var jsonBody = objectMapper.writeValueAsString(index);
+
+        Mockito.when(indexService.create(ArgumentMatchers.any(Index.class)))
+                .thenReturn(index);
+
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.post("/index")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonBody))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void GivenInvalidIndex_WhenCreatingIndex_ReturnBadRequestStatus() throws Exception {
+        // Arrange
+        var jsonBody = objectMapper.writeValueAsString(null);
+
+        Mockito.when(indexService.create(ArgumentMatchers.any(Index.class)))
+                .thenReturn(null);
+
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.post("/index")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonBody))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void GivenExistingIndex_WhenFindingIndexById_ReturnOkWithIndex() throws Exception {
+        // Arrange
+        var index = createSampleIndex();
+        var expectedJson = objectMapper.writeValueAsString(index);
+
+        Mockito.when(indexService.findById(index.id))
+                .thenReturn(index);
+
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.get("/index/{id}", index.id)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedJson));
+    }
+
+    @Test
+    void GivenNonExistentIndex_WhenFindingIndexById_ReturnNotFoundResponseStatus() throws Exception {
+        // Arrange
+        var randomId = UUID.randomUUID();
+
+        Mockito.when(indexService.findById(randomId))
+                .thenThrow(new NoSuchElementException("Index not found"));
+
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.get("/index/{id}", randomId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+}

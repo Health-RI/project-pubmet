@@ -15,9 +15,9 @@ import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.util.MimeTypeUtils;
 
 import java.io.StringReader;
 import java.util.Optional;
@@ -34,7 +34,7 @@ public class MetadataManagerControllerTest {
     MetadataManager provider;
 
     @Test
-    public void testMetadataRetrieval(@Autowired MockMvc mvc) throws Exception {
+    public void GivenExistingId_WhenGetMetadataById_ReturnModel(@Autowired MockMvc mvc) throws Exception {
         // Arrange
         var expectedModel = TestConstants.TEST_MODEL;
         var id = UUID.randomUUID();
@@ -42,8 +42,8 @@ public class MetadataManagerControllerTest {
         BDDMockito.given(provider.getMetadata(id))
                 .willReturn(Optional.of(expectedModel));
 
-        // Act & Assert
-        mvc.perform(get("/{id}", id))
+        // Assert
+        mvc.perform(get("/metadata/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("text/turtle"))
                 .andExpect(result -> {
@@ -60,17 +60,20 @@ public class MetadataManagerControllerTest {
     }
 
     @Test
-    public void GivenNewMetadata_WhenUploadMetadata_ReturnStatusCreated(@Autowired MockMvc mvc) throws Exception {
+    public void GivenModel_WhenUploadMetadata_ReturnStatusCreated(@Autowired MockMvc mvc) throws Exception {
         // Arrange
-        var contentType = MimeTypeUtils.APPLICATION_JSON.toString();
+        var contentType = "text/turtle";
         var modelContent = TestConstants.TEST_TURTLE;
+        var origin = "https://www.health-ri.nl/";
 
         // Act & Assert
-        var request = post("/")
+        var request = post("/metadata")
                 .content(modelContent)
-                .contentType(contentType);
+                .contentType(contentType)
+                .header(HttpHeaders.ORIGIN, origin);
 
         mvc.perform(request)
                 .andExpect(status().isCreated());
     }
+
 }
